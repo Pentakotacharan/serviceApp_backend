@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema({
   phone: { type: String, unique: true, sparse: true },
   password: { type: String },
   role: { type: String, enum: ['client','provider','admin'], default: 'client' },
-
+ firebaseUid: { type: String, unique: true, sparse: true },
   // KYC
   kycStatus: { type: String, enum: ['not_submitted','pending','approved','rejected'], default: 'not_submitted' },
   aadhaarNumber: { type: String },

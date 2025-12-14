@@ -51,4 +51,22 @@ const updateFcm = async (req, res) => {
   res.json({ message: 'FCM token updated' });
 };
 
-module.exports = { submitKyc, getProfile, updateFcm };
+const setRole = async (req, res) => {
+  try {
+    const { role } = req.body;
+
+    if (!["client", "provider"].includes(role)) {
+      return res.status(400).json({ message: "Invalid role" });
+    }
+
+    req.user.role = role;
+    await req.user.save();
+
+    res.json({ success: true, role });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to set role" });
+  }
+};
+
+
+module.exports = { submitKyc, getProfile, updateFcm,setRole };
