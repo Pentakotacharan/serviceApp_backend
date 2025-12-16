@@ -22,7 +22,7 @@ const loginWithFirebase = async (req, res) => {
         firebaseUid: decoded.uid,
         email: decoded.email || null,
         phone: decoded.phone_number || null,
-        role: null, // role selected later
+        role: client, // role selected later
       });
     }
 
