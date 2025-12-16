@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const admin = require("firebase-admin"); // 🔑 uses SAME instance from fcmserver
+const admin = require('../config/firebase'); // 🔑 uses SAME instance from fcmserver
 
 
 const loginWithFirebase = async (req, res) => {

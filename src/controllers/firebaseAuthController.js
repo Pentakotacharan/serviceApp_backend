@@ -1,4 +1,4 @@
-const admin = require("firebase-admin"); // 🔑 uses SAME instance from fcmserver
+const admin = require('../config/firebase'); // 🔑 uses SAME instance from fcmserver
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 
