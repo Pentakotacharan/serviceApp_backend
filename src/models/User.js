@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const UserSchema = new mongoose.Schema({
   name: { type: String },
   email: { type: String, unique: true, sparse: true },
-  phone: { type: String, unique: true, sparse: true },
+  phone: { type: String,  sparse: true },
   password: { type: String },
   role: { type: String, enum: ['client','provider','admin'], default: 'client' },
   firebaseUid: { type: String, unique: true, sparse: true },
