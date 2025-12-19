@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middlewares/auth');
 const upload = require('../middlewares/upload');
-const { submitKyc, getProfile, updateFcm } = require('../controllers/userController');
+const { submitKyc, getProfile, updateFcm,updateProfile } = require('../controllers/userController');
 const { setRole } = require("../controllers/userController");
 
 // Submit KYC - multipart form-data with files: aadhaarFront, aadhaarBack, panFront, panBack
@@ -15,6 +15,6 @@ router.post('/kyc', auth, upload.fields([
 
 router.get('/me', auth, getProfile);
 router.post('/fcm', auth, updateFcm);
-
+router.put("/profile", auth, updateProfile);
 router.post("/set-role", auth, setRole);
 module.exports = router;

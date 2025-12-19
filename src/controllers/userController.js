@@ -68,5 +68,31 @@ const setRole = async (req, res) => {
   }
 };
 
+// Update profile (name, etc.)
+const updateProfile = async (req, res) => {
+  try {
+    const user = req.user; // from auth middleware
+    const { name } = req.body;
 
-module.exports = { submitKyc, getProfile, updateFcm,setRole };
+    if (name) user.name = name;
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Profile updated successfully",
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to update profile" });
+  }
+};
+
+
+module.exports = { submitKyc, getProfile, updateFcm,setRole,  updateProfile };
