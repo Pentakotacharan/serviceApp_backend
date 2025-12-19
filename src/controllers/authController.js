@@ -20,8 +20,8 @@ const loginWithFirebase = async (req, res) => {
     if (!user) {
       user = await User.create({
         firebaseUid: decoded.uid,
-        email: decoded.email || null,
-        phone: decoded.phone_number || null,
+        email: decoded.email ,
+        phone: decoded.phone_number ,
         role: "client", // role selected later
       });
     }
