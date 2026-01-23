@@ -5,41 +5,74 @@ const { createOrder } = require('../services/razorpayService');
 const { findProvidersNearby } = require('../services/geoService');
 const { sendToToken } = require('../services/fcmService');
 
-// 1. Create order + task (client pays upfront). We create razorpay order (amount in paise)
-// Request body must include amount, category, description, lat, lng, images (urls or upload)
 const createTaskOrder = async (req, res) => {
   try {
     const { amount, category, description, lat, lng, images } = req.body;
-    if (!amount || !lat || !lng) return res.status(400).json({ message: 'Missing fields' });
+    if (!amount || !lat || !lng) {
+      return res.status(400).json({ message: "Missing fields" });
+    }
 
-    // create order on razorpay (amount in paise)
-    const order = await createOrder({ amount: Math.round(Number(amount) * 100), receipt: `rcpt_${Date.now()}` });
+    const order = await createOrder({
+      amount: Math.round(Number(amount) * 100),
+      receipt: `rcpt_${Date.now()}`
+    });
 
-    // Create Task with status pending and store razorpayOrderId
     const task = await Task.create({
       clientId: req.user._id,
       category,
       description,
       images: images || [],
-      location: { type: 'Point', coordinates: [parseFloat(lng), parseFloat(lat)] },
+      location: {
+        type: "Point",
+        coordinates: [parseFloat(lng), parseFloat(lat)],
+      },
       amount,
-      status: 'pending',
-      razorpayOrderId: order.id
+      status: "pending",
+      razorpayOrderId: order.id,
     });
 
-    // Create Payment record (held)
     await Payment.create({
       taskId: task._id,
       clientId: req.user._id,
       amount,
-      status: 'held',
-      razorpayOrderId: order.id
+      status: "held",
+      razorpayOrderId: order.id,
     });
 
-    res.json({ order, task });
+    // 🔔 FIND NEARBY ONLINE PROVIDERS (2 KM)
+    const providers = await User.find({
+      role: "provider",
+      kycStatus: "approved",
+      isOnline: true,
+      location: {
+        $near: {
+          $geometry: {
+            type: "Point",
+            coordinates: [parseFloat(lng), parseFloat(lat)],
+          },
+          $maxDistance: 2000, // 2 KM
+        },
+      },
+    });
+
+    // 🔔 SEND FCM NOTIFICATIONS
+    for (const provider of providers) {
+      if (provider.fcmToken) {
+        await sendToToken(provider.fcmToken, {
+          title: "New Task Nearby",
+          body: `${category} task near you. Tap to view.`,
+          data: {
+            taskId: task._id.toString(),
+          },
+        });
+      }
+    }
+
+    res.json({ order, task, notified: providers.length });
+
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Task creation failed' });
+    res.status(500).json({ message: "Task creation failed" });
   }
 };
 

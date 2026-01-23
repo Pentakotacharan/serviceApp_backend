@@ -20,7 +20,7 @@ const UserSchema = new mongoose.Schema({
   panFrontUrl: { type: String },
   panBackUrl: { type: String },
   adminRemarks: { type: String },
-
+  isOnline: { type: Boolean, default: false },
   // Location for geo queries
   location: {
     type: { type: String, enum: ['Point'], default: 'Point' },
